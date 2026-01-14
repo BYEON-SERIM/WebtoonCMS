@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import api from '@/api'
+import axios from 'axios' 
 
 export const useWebtoonStore = defineStore('webtoonStore', {
   state: () => ({
@@ -217,8 +218,8 @@ export const useWebtoonStore = defineStore('webtoonStore', {
 
     // Gemini 사용 api
     async recommendTags(description) {
-      const res = await api.get('/webtoons/recommend-tags', { params: { description } })
-      return res.data
+      const response = await api.post('/webtoons/recommend-tags', { description });
+      return response.data;
     },
     async aiPlotSearch(plot) {
       const res = await api.post('/webtoons/ai-search', { plot })

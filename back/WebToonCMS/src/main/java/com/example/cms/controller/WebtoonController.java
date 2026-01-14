@@ -47,8 +47,9 @@ public class WebtoonController {
     }
 
     // 태그 추천 
-    @GetMapping("/recommend-tags")
-    public String recommendTags(@RequestParam("description") String description) {
+    @PostMapping("/recommend-tags")
+    public String recommendTags(@RequestBody Map<String, String> request) {
+        String description = request.get("description");
         return webtoonService.getRecommendedTags(description);
     }
 
