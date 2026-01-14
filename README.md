@@ -9,7 +9,7 @@
 - **Frontend**: Vue 3, Vuetify 3 (Material Design Library)
 - **Backend**: Spring Boot 3.4, Spring Data JPA
 - **Data Access**: Spring Data JPA
-- **Database**: H2 Database / MySQL
+- **Database**: MySQL
 - **Language**: Java 17
 - **Library**: Lombok, Gradle
 
