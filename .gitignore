@@ -1,0 +1,29 @@
+# Eclipse metadata
+.metadata/
+.settings/
+.project
+.classpath
+
+# IntelliJ metadata
+.idea/
+*.iml
+
+# Build files
+bin/
+build/
+target/
+.gradle/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Sensitive Info (API Keys, DB passwords)
+application.properties
+**/application.properties
+application.yml
+**/application.yml
+.env
