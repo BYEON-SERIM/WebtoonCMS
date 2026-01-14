@@ -1,7 +1,6 @@
-<!-- @ts-nocheck -->
 <template>
   <v-container fluid class="pa-2 pa-sm-6 bg-grey-lighten-4" style="min-height: 100vh">
-    <!-- 1. 상단 요약 카드 (Store의 statsSummary 연동) -->
+    <!-- 1. 상단 요약 카드 -->
     <v-row class="mb-3">
       <v-col v-for="s in summary" :key="s.title" cols="12" sm="6" md="3" class="py-2">
         <v-card border flat class="rounded-lg pa-4 bg-white shadow-sm">
@@ -20,7 +19,7 @@
     </v-row>
 
     <v-row>
-      <!-- 2. 조회수 추이 차트 (DB dailyStats 연동) -->
+      <!-- 2. 조회수 추이 차트 -->
       <v-col cols="12" md="8" class="py-2">
         <v-card border flat class="rounded-lg pa-4 pa-sm-6 bg-white shadow-sm h-100">
           <div class="d-flex justify-space-between align-center mb-6">
@@ -49,7 +48,7 @@
         </v-card>
       </v-col>
 
-      <!-- 3. 장르별 비중 차트 (Store의 genreDistribution 연동) -->
+      <!-- 3. 장르별 비중 차트 -->
       <v-col cols="12" md="4" class="py-2">
         <v-card border flat class="rounded-lg pa-4 pa-sm-6 bg-white shadow-sm h-100">
           <div class="text-subtitle-1 font-weight-black mb-6">보유 장르 분포</div>
@@ -69,7 +68,7 @@
     </v-row>
 
     <v-row class="mt-1 mt-sm-3">
-      <!-- 4. 실시간 조회수 랭킹 TOP 5 (Store의 topFiveToons 연동) -->
+      <!-- 4. 실시간 조회수 랭킹 TOP 5  -->
       <v-col cols="12" md="8">
         <v-card border flat class="rounded-lg shadow-sm bg-white overflow-hidden">
           <v-card-title

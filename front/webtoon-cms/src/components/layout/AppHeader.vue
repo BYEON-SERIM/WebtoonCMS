@@ -13,7 +13,7 @@
 
     <v-spacer></v-spacer>
 
-    <!-- 알림 버튼 (모바일에서도 유지) -->
+    <!-- 알림 버튼 (기능 x) -->
     <v-btn
       icon="mdi-bell-outline"
       variant="text"
@@ -26,9 +26,8 @@
 
     <!-- 프로필 영역 -->
     <div class="d-flex align-center ga-2 ga-sm-3 ml-1 ml-sm-2 mr-2">
-      <!-- 이름과 파트는 모바일(sm 미만)에서 숨김 -->
       <div class="text-right d-none d-sm-block">
-        <p class="text-body-2 font-weight-bold mb-0" style="line-height: 1.2">김네버 사원</p>
+        <p class="text-body-2 font-weight-bold mb-0" style="line-height: 1.2">홍길동 사원</p>
         <p class="text-caption text-grey mb-0">콘텐츠 전략파트</p>
       </div>
 
