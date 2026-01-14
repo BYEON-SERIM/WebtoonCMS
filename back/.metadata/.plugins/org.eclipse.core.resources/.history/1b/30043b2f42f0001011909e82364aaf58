@@ -1,0 +1,130 @@
+package com.example.cms.controller;
+
+import com.example.cms.domain.DailyStat;
+import com.example.cms.domain.Webtoon;
+import com.example.cms.repository.DailyStatRepository;
+import com.example.cms.repository.WebtoonLogRepository;
+import com.example.cms.repository.WebtoonRepository;
+import com.example.cms.service.GeminiService;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/webtoons")
+@RequiredArgsConstructor
+public class CommonCodeController {
+
+    private final WebtoonRepository webtoonRepository;
+    private final WebtoonLogRepository logRepository;
+    private final DailyStatRepository dailyStatRepository; 
+    private final GeminiService geminiService;
+
+    // 1. [GET] /api/webtoons -> 전체 목록 조회
+    @GetMapping
+    public List<Webtoon> getWebtoons() {
+        return webtoonRepository.findAll();
+    }
+
+    // 2. [PUT] /api/webtoons/{id} -> 작품 정보 수정
+    @PutMapping("/{id}")
+    @Transactional
+    public Webtoon updateWebtoon(@PathVariable("id") Long id, @RequestBody Webtoon updatedData) {
+        return webtoonRepository.findById(id).map(webtoon -> {
+            webtoon.setTitle(updatedData.getTitle());
+            webtoon.setAuthor(updatedData.getAuthor());
+            webtoon.setGenre(updatedData.getGenre());
+            webtoon.setStatus(updatedData.getStatus());
+            webtoon.setDescription(updatedData.getDescription());
+            webtoon.setTags(updatedData.getTags());
+            
+            // [추가] 예약 시간 처리
+            if ("발행예약".equals(updatedData.getStatus())) {
+                webtoon.setScheduledAt(updatedData.getScheduledAt());
+            } else {
+                webtoon.setScheduledAt(null); // 상태가 예약이 아니면 시간 삭제
+            }
+
+            if (updatedData.getViewCount() != null) webtoon.setViewCount(updatedData.getViewCount());
+            
+            return webtoonRepository.save(webtoon);
+        }).orElseThrow(() -> new RuntimeException("작품 없음"));
+    }
+
+
+    // 3. [GET] /api/webtoons/recommend-tags -> AI 태그 추천
+    @GetMapping("/recommend-tags")
+    public String recommendTags(@RequestParam("description") String description) {
+        return geminiService.getRecommendedTags(description);
+    }
+    
+ // 2. 순서 저장 API
+    @PutMapping("/order")
+    @Transactional
+    public void updateOrder(@RequestBody List<Long> webtoonIds) {
+        for (int i = 0; i < webtoonIds.size(); i++) {
+            Long id = webtoonIds.get(i);
+            Webtoon webtoon = webtoonRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 웹툰이 없습니다. id=" + id));
+            webtoon.setSortOrder(i); // 리스트의 인덱스 번호를 순서로 저장
+        }
+    }
+    
+ // 4. [POST] /api/webtoons -> 신규 작품 등록
+    @PostMapping
+    public Webtoon addWebtoon(@RequestBody Webtoon webtoon) {
+        // 1. 초기 데이터 세팅 (조회수 0)
+        if (webtoon.getViewCount() == null) {
+            webtoon.setViewCount(0L);
+        }
+        
+        // 2. 순서 세팅 (현재 저장된 작품 수 + 1)
+        if (webtoon.getSortOrder() == null) {
+            webtoon.setSortOrder((int) webtoonRepository.count() + 1);
+        }
+
+        // 3. DB 저장 및 결과 반환
+        return webtoonRepository.save(webtoon);
+    }
+
+    // 5. [DELETE] /api/webtoons/{id} -> 작품 삭제
+    @DeleteMapping("/{id}")
+    public void deleteWebtoon(@PathVariable("id") Long id) {
+        Webtoon webtoon = webtoonRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("삭제할 작품이 없습니다. id=" + id));
+        webtoonRepository.delete(webtoon);
+    }
+    
+ // WebtoonController.java 에 추가
+
+    @PostMapping("/ai-find-title")
+    public String aiFindTitle(@RequestBody Map<String, String> request) {
+        String plotQuery = request.get("plot");
+        List<Webtoon> allWebtoons = webtoonRepository.findAll();
+        
+        // DB의 모든 작품 정보를 컨텍스트로 구성
+        String webtoonContext = allWebtoons.stream()
+            .map(w -> String.format("제목: %s, 줄거리: %s", w.getTitle(), w.getDescription()))
+            .collect(Collectors.joining("\n"));
+
+        String prompt = String.format(
+            "너는 웹툰 플랫폼의 운영 전문가야. 다음 웹툰 목록을 참고해서 사용자의 설명과 가장 일치하는 작품 '제목'을 찾고 그 이유를 짧게 설명해줘.\n\n" +
+            "[작품 목록]\n%s\n\n" +
+            "[사용자 설명]\n%s\n\n" +
+            "결과는 반드시 '추천 작품: [제목]\n이유: [설명]' 형식으로 응답해줘. 만약 목록에 없다면 비슷한 장르를 추천해줘.",
+            webtoonContext, plotQuery
+        );
+
+        return geminiService.getRecommendedTags(prompt);
+    }
+    
+    @GetMapping("/daily-stats")
+    public List<DailyStat> getDailyStats() {
+        return dailyStatRepository.findAllByOrderByStatDateAsc();
+    }
+}

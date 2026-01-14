@@ -1,0 +1,38 @@
+package com.example.cms.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+public class Webtoon {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+    private String author;
+    private String genre;
+    private String status;
+    private Long viewCount;
+    private String thumbnail;
+    private Integer sortOrder;
+    
+    @Column(columnDefinition = "TEXT")
+    private String description; // 줄거리
+    
+    private String tags; // 추천 태그
+
+    @Builder
+    public Webtoon(String title, String author, String genre, String status, Long viewCount, String thumbnail, String description, int sortOrder) {
+        this.title = title;
+        this.author = author;
+        this.genre = genre;
+        this.status = status;
+        this.viewCount = viewCount;
+        this.thumbnail = thumbnail;
+        this.description = description;
+        this.sortOrder = sortOrder;
+    }
+}

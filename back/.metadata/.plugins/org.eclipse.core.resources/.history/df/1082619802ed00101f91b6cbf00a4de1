@@ -1,0 +1,52 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.1' // 안정적인 3.4 버전 추천
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Webtoon CMS Backend with Gemini AI'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+// Lombok 설정을 위해 추가
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+	// Spring AI(Gemini) 라이브러리를 받기 위한 저장소
+	maven { url 'https://repo.spring.io/milestone' }
+}
+
+dependencies {
+	// 1. 웹 API 개발을 위한 필수 스타터
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	
+	// 2. DB 연동 (JPA + MySQL)
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	
+	// 3. Gemini AI 연동 (Spring AI)
+	implementation 'org.springframework.ai:spring-ai-google-gemini-spring-boot-starter'
+
+	// 4. 코드 간소화 (Lombok)
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	// 5. 테스트 및 기타
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

@@ -1,0 +1,12 @@
+arguments=
+auto.sync=false
+eclipse.preferences.version=1
+experimental.module.support=false
+gradle.build.scans=false
+gradle.distribution=GRADLE_DISTRIBUTION(WRAPPER)
+gradle.offline.mode=false
+java.home=C\:\\DEV_SRC\\Tools\\STS\\java-17-openjdk-17.0.3.0.6-1.win.x86_64
+jvm.arguments=
+problems.api.support=false
+show.console.view=true
+show.executions.view=true

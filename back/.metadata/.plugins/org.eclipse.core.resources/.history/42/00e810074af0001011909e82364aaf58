@@ -1,0 +1,63 @@
+package com.example.cms.controller;
+
+import com.example.cms.domain.DailyStat;
+import com.example.cms.domain.Webtoon;
+import com.example.cms.dto.WebtoonRequest;
+import com.example.cms.service.DailyStatService;
+import com.example.cms.service.WebtoonService;
+import com.example.cms.service.GeminiService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/webtoons")
+@RequiredArgsConstructor
+public class WebtoonController {
+
+    private final WebtoonService webtoonService;
+    private final DailyStatService dailyStatService;
+    private final GeminiService geminiService;
+
+    @GetMapping
+    public List<Webtoon> getWebtoons() {
+        return webtoonService.findAll();
+    }
+
+    @PostMapping
+    public Webtoon addWebtoon(@RequestBody WebtoonRequest dto) {
+        return webtoonService.addWebtoon(dto);
+    }
+
+    @PutMapping("/{id}")
+    public Webtoon updateWebtoon(@PathVariable("id") Long id, @RequestBody WebtoonRequest dto) {
+        return webtoonService.updateWebtoon(id, dto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteWebtoon(@PathVariable("id") Long id) {
+        webtoonService.deleteWebtoon(id);
+    }
+
+    @PutMapping("/order")
+    public void updateOrder(@RequestBody List<Long> webtoonIds) {
+        webtoonService.updateOrder(webtoonIds);
+    }
+
+    @GetMapping("/recommend-tags")
+    public String recommendTags(@RequestParam("description") String description) {
+        return geminiService.getRecommendedTags(description);
+    }
+
+    @PostMapping("/ai-find-title")
+    public String aiFindTitle(@RequestBody Map<String, String> request) {
+        return webtoonService.findTitleByAi(request.get("plot"));
+    }
+
+    @GetMapping("/daily-stats")
+    public List<DailyStat> getDailyStats() {
+        return dailyStatService.getDailyStats();
+    }
+}

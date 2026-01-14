@@ -1,0 +1,61 @@
+package com.example.cms.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import java.util.Map;
+import java.util.List;
+
+@Service
+public class GeminiService {
+
+    private final WebClient webClient;
+
+    @Value("${gemini.api.key}")
+    private String apiKey;
+
+    public GeminiService(WebClient.Builder webClientBuilder) {
+        // 도메인 뒤에 슬래시(/)를 넣지 마세요.
+        this.webClient = webClientBuilder
+            .baseUrl("https://generativelanguage.googleapis.com")
+            .build();
+    }
+
+    public String getRecommendedTags(String description) {
+        String prompt = "웹툰 줄거리: " + description + "\n위 내용을 분석해서 어울리는 태그 5개를 #태그1, #태그2 형식으로 답변해줘.";
+
+        Map<String, Object> body = Map.of(
+            "contents", List.of(
+                Map.of("parts", List.of(
+                    Map.of("text", prompt)
+                ))
+            )
+        );
+
+        try {
+            return webClient.post()
+                // [수정] 모델명을 리스트에서 확인한 gemini-2.5-flash로 변경
+                .uri("/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .map(res -> {
+                    try {
+                        List candidates = (List) res.get("candidates");
+                        Map firstCandidate = (Map) candidates.get(0);
+                        Map content = (Map) firstCandidate.get("content");
+                        List parts = (List) content.get("parts");
+                        Map firstPart = (Map) parts.get(0);
+                        return (String) firstPart.get("text");
+                    } catch (Exception e) {
+                        return "태그 생성 실패";
+                    }
+                })
+                .block();
+        } catch (Exception e) {
+            System.err.println("최종 에러 로그: " + e.getMessage());
+            return "AI 서비스 연결 실패";
+        }
+    }
+}

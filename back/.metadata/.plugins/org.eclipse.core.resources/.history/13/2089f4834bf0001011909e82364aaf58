@@ -1,0 +1,119 @@
+package com.example.cms.service;
+
+import com.example.cms.domain.Webtoon;
+import com.example.cms.dto.WebtoonRequest;
+import com.example.cms.repository.WebtoonRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true) // 전체적으로 읽기 전용 (성능 최적화)
+public class WebtoonService {
+
+    private final WebtoonRepository webtoonRepository;
+    private final GeminiService geminiService;
+
+    
+	/* 전체 웹툰 리스트 조회 */
+    public List<Webtoon> findAll() {
+        return webtoonRepository.findAll();
+    }
+
+	/* 신규 웹툰 등록 */
+    @Transactional
+    public Webtoon addWebtoon(WebtoonRequest dto) {
+        Webtoon webtoon = dto.toEntity();
+        
+        //초기 조회수는 0
+        if (webtoon.getViewCount() == null) {
+            webtoon.setViewCount(0L);
+        }
+        
+        if (webtoon.getSortOrder() == null) {
+            // 현재 등록된 작품 수 + 1로 순서 지정
+            webtoon.setSortOrder((int) webtoonRepository.count() + 1);
+        }
+        
+        return webtoonRepository.save(webtoon);
+    }
+ 
+	/* 웹툰 수정 */
+    @Transactional
+    public Webtoon updateWebtoon(Long id, WebtoonRequest dto) {
+        Webtoon webtoon = webtoonRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("수정할 작품이 없습니다. id=" + id));
+
+        // 필드 업데이트
+        webtoon.setTitle(dto.getTitle());
+        webtoon.setAuthor(dto.getAuthor());
+        webtoon.setGenre(dto.getGenre());
+        webtoon.setStatus(dto.getStatus());
+        webtoon.setDescription(dto.getDescription());
+        webtoon.setTags(dto.getTags());
+
+        if ("발행예약".equals(dto.getStatus())) {
+            webtoon.setScheduledAt(dto.getScheduledAt());
+        } else {
+            webtoon.setScheduledAt(null);
+        }
+
+        if (dto.getViewCount() != null) {
+            webtoon.setViewCount(dto.getViewCount());
+        }
+
+        return webtoon;
+    }
+
+	/* 웹툰 순서 수정 */
+    // .orElseThrow : 만약 데이터가 없다면 에러
+    @Transactional
+    public void updateOrder(List<Long> webtoonIds) {
+        for (int i = 0; i < webtoonIds.size(); i++) {
+            Long id = webtoonIds.get(i);
+            Webtoon webtoon = webtoonRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("순서 변경 중 오류: 해당 웹툰이 없습니다. id=" + id));
+            webtoon.setSortOrder(i);
+        }
+    }
+
+	/* 웹툰 삭제 */
+    @Transactional
+    public void deleteWebtoon(Long id) {
+        Webtoon webtoon = webtoonRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("삭제할 작품이 없습니다. id=" + id));
+        webtoonRepository.delete(webtoon);
+    }
+
+    /* AI 태그 추천 */
+    public String getRecommendedTags(String description) {
+        String prompt = String.format(
+            "웹툰 줄거리: %s\n\n위 내용을 분석해서 어울리는 태그 5개를 #태그1, #태그2 형식으로 답변해줘.", 
+            description
+        );
+        return geminiService.generateContent(prompt);
+    }
+
+	/* AI 제목 찾기 */
+    public String findTitleByAi(String plotQuery) {
+        List<Webtoon> allWebtoons = webtoonRepository.findAll();
+        
+        String webtoonContext = allWebtoons.stream()
+                .map(w -> String.format("제목: %s, 줄거리: %s", w.getTitle(), w.getDescription()))
+                .collect(Collectors.joining("\n"));
+
+        String prompt = String.format(
+                "너는 웹툰 플랫폼의 운영 전문가야. 다음 웹툰 목록을 참고해서 사용자의 설명과 가장 일치하는 작품 '제목'을 찾고 그 이유를 짧게 설명해줘.\n\n" +
+                "[작품 목록]\n%s\n\n" +
+                "[사용자 설명]\n%s\n\n" +
+                "결과는 반드시 '추천 작품: [제목]\n이유: [설명]' 형식으로 응답해줘.",
+                webtoonContext, plotQuery
+        );
+
+        return geminiService.generateContent(prompt);
+    }
+}

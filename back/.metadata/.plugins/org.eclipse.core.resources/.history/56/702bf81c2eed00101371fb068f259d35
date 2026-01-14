@@ -1,0 +1,26 @@
+// GeminiService.java 내부의 .uri 부분만 수정하세요
+try {
+    return webClient.post()
+        // [수정] 모델명을 리스트에서 확인한 gemini-2.5-flash로 변경
+        .uri("/v1beta/models/gemini-2.5-flash:generateContent?key=" + apiKey)
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(body)
+        .retrieve()
+        .bodyToMono(Map.class)
+        .map(res -> {
+            try {
+                List candidates = (List) res.get("candidates");
+                Map firstCandidate = (Map) candidates.get(0);
+                Map content = (Map) firstCandidate.get("content");
+                List parts = (List) content.get("parts");
+                Map firstPart = (Map) parts.get(0);
+                return (String) firstPart.get("text");
+            } catch (Exception e) {
+                return "태그 생성 실패";
+            }
+        })
+        .block();
+} catch (Exception e) {
+    System.err.println("최종 에러 로그: " + e.getMessage());
+    return "AI 서비스 연결 실패";
+}

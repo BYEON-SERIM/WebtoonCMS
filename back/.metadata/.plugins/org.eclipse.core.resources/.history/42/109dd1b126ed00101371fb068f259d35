@@ -1,0 +1,27 @@
+package com.example.cms.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Getter @Setter
+@NoArgsConstructor // 기본 생성자
+@AllArgsConstructor // 모든 필드를 받는 생성자 (id 포함)
+@Builder // 빌더 패턴 사용 가능하게 함
+public class Webtoon {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+    private String author;
+    private String genre;
+    private String status;
+    private Long viewCount;
+    private String thumbnail;
+    
+    @Column(columnDefinition = "TEXT")
+    private String description; // AI용 줄거리
+    
+    private String tags; // 추천 태그
+}

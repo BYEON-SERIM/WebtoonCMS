@@ -1,0 +1,18 @@
+# 1. 어플리케이션 이름
+spring.application.name=WebToonCMS
+
+# 2. 데이터베이스 연결 설정 (mysql -> webtoon_db로 변경!)
+spring.datasource.url=jdbc:mysql://localhost:3306/webToon?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+spring.datasource.username=root
+spring.datasource.password=1234
+
+# 3. JPA/Hibernate 설정 (매우 중요!)
+# update: 자바 엔티티(Entity) 클래스를 바탕으로 테이블을 자동으로 생성하거나 수정해줍니다.
+spring.jpa.hibernate.ddl-auto=update
+# 콘솔창에 실제 실행되는 SQL 문을 출력해줍니다 (공부할 때 큰 도움이 됨).
+spring.jpa.show-sql=true
+# SQL을 보기 좋게 정렬해서 출력합니다.
+spring.jpa.properties.hibernate.format_sql=true
+
+# 4. Gemini API 설정 (지난번에 받아둔 키)
+gemini.api.key=AIzaSyCTZOmeYrC9NaoJi9Ad0jTP3ZW8I0ud6Sc

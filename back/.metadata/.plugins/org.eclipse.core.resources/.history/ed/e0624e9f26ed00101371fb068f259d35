@@ -1,0 +1,30 @@
+package com.example.cms.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+public class WebtoonLog {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String message;
+    private String color;
+    private LocalDateTime createdAt;
+
+    // Pinia에서 사용하는 'HH:mm' 포맷을 위한 가상 필드
+    public String getTime() {
+        if (this.createdAt == null) return "";
+        return this.createdAt.format(DateTimeFormatter.ofPattern("HH:mm"));
+    }
+
+    @PrePersist // 저장되기 직전에 현재 시간 설정
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+}

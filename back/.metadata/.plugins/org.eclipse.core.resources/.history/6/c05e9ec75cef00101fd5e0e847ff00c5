@@ -1,0 +1,50 @@
+package com.example.cms.scheduler;
+
+import com.example.cms.domain.Webtoon;
+import com.example.cms.domain.WebtoonLog;
+import com.example.cms.repository.WebtoonLogRepository;
+import com.example.cms.repository.WebtoonRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
+
+@Configuration
+public class WebtoonScheduler {
+
+    @Bean
+    CommandLineRunner initData(WebtoonRepository webtoonRepository, WebtoonLogRepository logRepository) {
+        return args -> {
+            if (webtoonRepository.count() == 0) {
+                webtoonRepository.saveAll(List.of(
+                    Webtoon.builder().title("외모지상주의").author("박태준").genre("에피소드").status("연재중").viewCount(95000000L).thumbnail("https://via.placeholder.com/150x200?text=Lookism").description("평범한 고등학생이 두 개의 몸을 가지게 되며 벌어지는 학원 액션물").sortOrder(1).build(),
+                    Webtoon.builder().title("전지적 독자 시점").author("슬리피-C / 싱숑").genre("판타지").status("연재중").viewCount(78000000L).thumbnail("https://via.placeholder.com/150x200?text=ORV").description("멸망해버린 소설 속 세상에서 유일하게 결말을 아는 주인공의 생존기").sortOrder(2).build(),
+                    Webtoon.builder().title("내 남편과 결혼해줘").author("LICO / 성소작").genre("로맨스").status("완결").viewCount(45000000L).thumbnail("https://via.placeholder.com/150x200?text=MarryMe").description("남편과 절친의 배신으로 죽음을 맞이한 주인공이 10년 전으로 회귀해 복수하는 이야기").sortOrder(3).build(),
+                    Webtoon.builder().title("재혼 황후").author("히어리 / 알파타르트").genre("로맨스판타지").status("연재중").viewCount(62000000L).thumbnail("https://via.placeholder.com/150x200?text=Empress").description("황제의 변심으로 이혼을 위기에 처한 황후가 이웃나라 황제와 재혼을 선언하는 당당한 행보").sortOrder(4).build(),
+                    Webtoon.builder().title("신의 탑").author("SIU").genre("판타지").status("연재중").viewCount(89000000L).thumbnail("https://via.placeholder.com/150x200?text=TOG").description("자신의 모든 것이었던 소녀를 쫓아 탑에 들어온 소년, 그리고 그를 시험하는 탑의 이야기").sortOrder(5).build(),
+                    Webtoon.builder().title("유미의 세포들").author("이동건").genre("에피소드").status("완결").viewCount(52000000L).thumbnail("https://via.placeholder.com/150x200?text=Yumi").description("유미의 머릿속 세포들이 만들어가는 유미의 평범하면서도 특별한 일상").sortOrder(6).build(),
+                    Webtoon.builder().title("작전명 순정").author("꼬냑 / 놈놈").genre("로맨스").status("연재중").viewCount(12000000L).thumbnail("https://via.placeholder.com/150x200?text=PureLove").description("사랑받을 수 없는 운명을 타고난 소녀가 시스템을 상대로 벌이는 짜릿한 연애 작전").sortOrder(7).build(),
+                    Webtoon.builder().title("스위트홈").author("김칸비 / 황영찬").genre("스릴러").status("완결").viewCount(38000000L).thumbnail("https://via.placeholder.com/150x200?text=SweetHome").description("욕망에 갇힌 사람들이 괴물로 변해버린 세상, 고립된 아파트에서 벌어지는 생존 사투").sortOrder(8).build(),
+                    Webtoon.builder().title("더 복서").author("정지훈").genre("스포츠").status("완결").viewCount(25000000L).thumbnail("https://via.placeholder.com/150x200?text=TheBoxer").description("압도적인 재능을 가진 괴물 주인공과 그를 둘러싼 복서들의 치열한 삶과 철학").sortOrder(9).build(),
+                    Webtoon.builder().title("로어 올림푸스").author("레이첼 스마이스").genre("로맨스판타지").status("연재중").viewCount(15000000L).thumbnail("https://via.placeholder.com/150x200?text=Lore").description("그리스 신화를 현대적으로 재해석한 페르세포네와 하데스의 매혹적인 사랑 이야기").sortOrder(10).build()
+                ));
+                System.out.println(">> 웹툰 테스트 데이터 10개 삽입 완료!");
+            }
+
+            // 2. 로그 데이터 추가 (시스템 변경 이력)
+            if (logRepository.count() == 0) {
+                logRepository.saveAll(List.of(
+                    new WebtoonLog("[외모지상주의] 메인 큐레이션 1위로 이동", "deep-purple"),
+                    new WebtoonLog("[신의 탑] AI 태그 자동 생성 완료 (#판타지, #성장물)", "primary"),
+                    new WebtoonLog("[유미의 세포들] 완결 상태로 변경됨", "grey"),
+                    new WebtoonLog("[전지적 독자 시점] 신규 회차 업데이트 확인", "blue"),
+                    new WebtoonLog("[재혼 황후] 썸네일 이미지 교체 완료", "green"),
+                    new WebtoonLog("시스템 정기 점검 완료 - DB 최적화", "orange"),
+                    new WebtoonLog("[스위트홈] 조회수 이상 급증 감지", "red")
+                ));
+                System.out.println(">> 로그 테스트 데이터 7개 삽입 완료!");
+            }
+        };
+    }
+}

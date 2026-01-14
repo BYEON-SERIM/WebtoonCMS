@@ -1,0 +1,25 @@
+package com.example.cms.config;
+
+import com.example.cms.domain.Webtoon;
+import com.example.cms.repository.WebtoonRepository;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class DataInitializer {
+
+    @Bean
+    CommandLineRunner initData(WebtoonRepository repository) {
+        return args -> {
+            if (repository.count() == 0) {
+                repository.save(new Webtoon("외모지상주의", "박태준", "에피소드", "연재중", 95000000L, "https://via.placeholder.com/150x200?text=Lookism", "외모가 바뀌며 생기는 이야기"));
+                repository.save(new Webtoon("전지적 독자 시점", "싱숑", "판타지", "연재중", 78000000L, "https://via.placeholder.com/150x200?text=ORV", "멸망한 세상에서 시나리오를 깨가는 이야기"));
+                repository.save(new Webtoon("내 남편과 결혼해줘", "성소작", "로맨스", "완결", 45000000L, "https://via.placeholder.com/150x200?text=MarryMe", "과거로 돌아가 복수하는 이야기"));
+                repository.save(new Webtoon("재혼 황후", "알파타르트", "로맨스판타지", "연재중", 62000000L, "https://via.placeholder.com/150x200?text=Empress", "황후가 재혼을 선언하는 이야기"));
+                
+                System.out.println(">> 테스트 데이터 삽입 완료!");
+            }
+        };
+    }
+}

@@ -1,0 +1,27 @@
+package com.example.cms.domain;
+
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.LocalDateTime;
+
+@Entity
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class WebtoonLog {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String message;
+    private String color;
+    private LocalDateTime createdAt;
+
+    // 편리하게 데이터를 넣기 위한 수동 생성자 추가
+    public WebtoonLog(String message, String color) {
+        this.message = message;
+        this.color = color;
+        this.createdAt = LocalDateTime.now();
+    }
+}
