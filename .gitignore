@@ -18,8 +18,14 @@ target/
 .DS_Store
 Thumbs.db
 
+# 모든 폴더 하위의 metadata 폴더 제외
+**/.metadata/
+**/back/.metadata/
+
 # Log files
 *.log
+*.index
+*.xmi
 
 # Sensitive Info (API Keys, DB passwords)
 application.properties

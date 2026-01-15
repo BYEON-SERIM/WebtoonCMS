@@ -1,7 +1,0 @@
-package com.example.cms.config;
-
-import com.example.cms.domain.WebtoonLog;
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface WebtoonLogRepository extends JpaRepository<WebtoonLog, Long> {
-}
